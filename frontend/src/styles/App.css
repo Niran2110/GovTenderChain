@@ -1,0 +1,280 @@
+:root {
+  --primary-color: #2c3e50;      /* Dark Blue */
+  --secondary-color: #3498db;    /* Bright Blue */
+  --light-gray: #f4f7f9;
+  --medium-gray: #ecf0f1;
+  --dark-text: #333;
+  --light-text: #7f8c8d;
+  --success-color: #2ecc71;      /* Green */
+  --warning-color: #f39c12;      /* Orange */
+  --danger-color: #e74c3c;       /* Red */
+  --border-radius: 8px;
+  --box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+}
+
+body {
+  margin: 0;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen,
+    Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+  background-color: var(--light-gray);
+  color: var(--dark-text);
+}
+
+.main-content {
+  padding: 2rem;
+  max-width: 1400px;
+  margin: 0 auto;
+}
+
+.page-container {
+    background-color: white;
+    padding: 2rem;
+    border-radius: var(--border-radius);
+    box-shadow: var(--box-shadow);
+    position: relative;
+}
+
+a {
+  text-decoration: none;
+  color: var(--secondary-color);
+}
+
+.app-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1rem 2rem;
+  background-color: white;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+}
+
+.logo {
+  font-size: 1.5rem;
+  font-weight: bold;
+  color: var(--primary-color);
+}
+
+.app-header nav {
+  display: flex;
+  align-items: center;
+  gap: 1.5rem;
+}
+
+.app-header nav a {
+  color: var(--dark-text);
+  font-weight: 500;
+  position: relative;
+  padding: 0.5rem 0;
+}
+
+.app-header nav a::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 0;
+  height: 2px;
+  background-color: var(--secondary-color);
+  transition: width 0.3s ease;
+}
+
+.app-header nav a:hover::after {
+  width: 100%;
+}
+
+.auth-button {
+  background-color: var(--secondary-color);
+  color: white;
+  border: none;
+  padding: 0.6rem 1.2rem;
+  border-radius: 5px;
+  cursor: pointer;
+  font-weight: 500;
+  transition: background-color 0.2s ease;
+}
+
+.auth-button:hover { background-color: #2980b9; }
+
+.homepage-container { text-align: center; }
+.hero-section {
+    padding: 6rem 2rem;
+    background: linear-gradient(rgba(44, 62, 80, 0.8), rgba(44, 62, 80, 0.8)), url('https://images.pexels.com/photos/3184418/pexels-photo-3184418.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1');
+    background-size: cover;
+    background-position: center;
+    border-radius: var(--border-radius);
+    color: white;
+}
+.hero-section h1 { font-size: 3rem; margin-bottom: 1rem; }
+.hero-section p { font-size: 1.2rem; margin-bottom: 2rem; }
+.cta-button {
+    background-color: var(--secondary-color);
+    color: white !important;
+    padding: 1rem 2rem;
+    border: none;
+    border-radius: 5px;
+    font-size: 1.1rem;
+    font-weight: bold;
+    transition: transform 0.2s ease, background-color 0.2s ease;
+    cursor: pointer;
+}
+.cta-button:hover { transform: scale(1.05); background-color: #2980b9; }
+
+.login-container { display: flex; justify-content: center; align-items: center; padding-top: 5rem; }
+.login-form {
+  background: white; padding: 2.5rem; border-radius: var(--border-radius);
+  box-shadow: var(--box-shadow); width: 100%; max-width: 400px;
+}
+.login-form h2 { text-align: center; margin-bottom: 2rem; color: var(--primary-color); }
+.form-group { margin-bottom: 1.5rem; }
+.form-group label { display: block; margin-bottom: 0.5rem; font-weight: 500; }
+.form-group input { width: 100%; padding: 0.8rem; border: 1px solid #ccc; border-radius: 5px; box-sizing: border-box; }
+.login-form button {
+  width: 100%; padding: 0.8rem; border: none; border-radius: 5px;
+  background-color: var(--primary-color); color: white;
+  font-size: 1rem; font-weight: bold; cursor: pointer; transition: background-color 0.2s ease;
+}
+.login-form button:hover { background-color: #34495e; }
+.error { color: var(--danger-color); font-size: 0.9rem; margin-top: 5px; }
+.error.center { text-align: center; margin-top: 1rem; }
+.login-info { margin-top: 1.5rem; padding: 1rem; background-color: var(--light-gray); border-radius: 5px; font-size: 0.9rem; text-align: center; }
+
+.tender-list { display: grid; grid-template-columns: repeat(auto-fill, minmax(350px, 1fr)); gap: 20px; }
+.tender-card-link { text-decoration: none; color: inherit; }
+.tender-card {
+  background: white; border-radius: var(--border-radius); padding: 20px;
+  box-shadow: var(--box-shadow); transition: transform 0.2s ease, box-shadow 0.2s ease;
+  border-left: 5px solid var(--secondary-color);
+}
+.tender-card:hover { transform: translateY(-5px); box-shadow: 0 8px 16px rgba(0,0,0,0.12); }
+.tender-card-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 15px; }
+.tender-card h3 { margin: 0; color: var(--primary-color); }
+.tender-card p { margin: 5px 0; color: var(--light-text); }
+
+.status-badge {
+  padding: 5px 12px; border-radius: 15px;
+  font-size: 0.8rem; font-weight: bold; color: white; white-space: nowrap;
+}
+.status-open { background-color: var(--success-color); }
+.status-progress { background-color: var(--warning-color); }
+.status-completed { background-color: var(--light-text); }
+/* --- NEW CANCELLED STATUS --- */
+.status-cancelled { background-color: #7f8c8d; color: white; }
+
+/* Bid Status Colors */
+.status-pending { background-color: var(--warning-color); }
+.status-awarded { background-color: var(--success-color); }
+.status-rejected { background-color: #c0392b; }
+
+.register-link { text-align: center; margin-top: 1.5rem; padding-top: 1rem; border-top: 1px solid var(--medium-gray); }
+.register-link p { margin: 0; color: var(--light-text); }
+.register-link a { font-weight: bold; color: var(--secondary-color); }
+.register-form { max-width: 500px; }
+
+.tender-detail-container .tender-meta { display: flex; gap: 30px; background: var(--light-gray); padding: 15px; border-radius: 5px; margin: 20px 0; flex-wrap: wrap; }
+.tender-detail-container .tender-meta p { margin: 0; }
+.tender-detail-container .tender-description { line-height: 1.6; }
+.milestones-list { margin-top: 30px; }
+.milestone-card {
+  display: flex; justify-content: space-between; align-items: center;
+  padding: 15px; border: 1px solid var(--medium-gray); border-radius: 5px; margin-bottom: 10px;
+}
+.milestone-info h4 { margin: 0 0 5px 0; color: var(--primary-color); }
+.milestone-info p { margin: 0; }
+.milestone-status { text-align: right; }
+.milestone-status .status-badge { display: block; margin-bottom: 10px; }
+.milestone-pending { background-color: #e67e22; }
+.milestone-approved { background-color: var(--secondary-color); }
+.milestone-paid { background-color: var(--success-color); }
+.milestone-review { background-color: #9b59b6; }
+
+.approve-button {
+  background-color: var(--success-color); color: white; border: none;
+  padding: 8px 12px; border-radius: 5px; cursor: pointer; font-weight: bold;
+  transition: background-color 0.2s ease; margin-top: 10px;
+}
+.approve-button:hover { background-color: #27ae60; }
+.awarded-info { background: var(--light-gray); border-left: 5px solid var(--success-color); padding: 1rem; margin: 2rem 0; border-radius: 5px; }
+.dashboard-container .dashboard-section-title { margin-top: 2.5rem; border-bottom: 2px solid var(--medium-gray); padding-bottom: 0.5rem; }
+
+.eligibility-info {
+  margin-top: 10px; font-size: 0.9rem; padding: 5px 10px;
+  background-color: var(--medium-gray); border-radius: 5px; display: inline-block;
+}
+.detail-eligibility { font-size: 1rem; }
+.bid-section { margin-top: 2.5rem; padding: 2rem; border: 1px solid var(--medium-gray); border-radius: var(--border-radius); background-color: #fcfcfc;}
+.bid-section h3 { margin-top: 0; border-bottom: 2px solid var(--secondary-color); padding-bottom: 0.5rem; display: inline-block; }
+.bid-form { margin-top: 1.5rem; }
+.bid-form .form-group input[type="file"] { padding: 0; border: none; }
+.notice { padding: 1rem; border-radius: 5px; font-weight: 500; }
+.error-notice { background-color: #fbecec; color: var(--danger-color); border: 1px solid var(--danger-color); }
+.success-notice { background-color: #eaf7ed; color: var(--success-color); border: 1px solid var(--success-color); }
+.form-description { font-style: italic; color: var(--light-text); text-align: center; margin-bottom: 2rem; }
+.register-form h4 { margin-top: 2rem; margin-bottom: 1rem; color: var(--primary-color); border-bottom: 1px solid var(--medium-gray); padding-bottom: 0.5rem; }
+
+.create-tender-form fieldset { border: 1px solid var(--medium-gray); border-radius: var(--border-radius); padding: 1.5rem; margin-bottom: 2rem; }
+.create-tender-form legend { font-size: 1.2rem; font-weight: bold; color: var(--primary-color); padding: 0 0.5rem; }
+.create-tender-form textarea { width: 100%; padding: 0.8rem; border: 1px solid #ccc; border-radius: 5px; box-sizing: border-box; font-family: inherit; font-size: 1rem; }
+.multi-select { width: 100%; padding: 0.5rem; height: 100px; border: 1px solid #ccc; border-radius: 5px; }
+.milestone-fields { display: flex; gap: 10px; margin-bottom: 10px; align-items: center; }
+.milestone-fields input { flex: 1; }
+.add-btn, .remove-btn { padding: 0.5rem 1rem; border-radius: 5px; border: none; cursor: pointer; font-weight: bold; }
+.add-btn { background-color: var(--secondary-color); color: white; }
+.remove-btn { background-color: var(--danger-color); color: white; }
+
+.admin-actions { background-color: var(--light-gray); padding: 1.5rem; margin: 2rem 0; border-radius: var(--border-radius); border: 1px solid var(--medium-gray); text-align: center; display: flex; justify-content: center; align-items: center; gap: 20px; }
+.bids-table { width: 100%; border-collapse: collapse; margin-top: 2rem; }
+.bids-table th, .bids-table td { border: 1px solid #ddd; padding: 12px; text-align: left; }
+.bids-table th { background-color: var(--primary-color); color: white; font-size: 1.1rem; }
+.bids-table tr:nth-child(even) { background-color: var(--light-gray); }
+.bids-table tr:hover { background-color: #e2e2e2; }
+.bids-table a { font-weight: bold; text-decoration: underline; }
+.award-button { background-color: var(--success-color); font-size: 0.9rem; padding: 0.7rem 1rem; }
+.award-button:hover { background-color: #27ae60; }
+
+.delete-corner-btn { position: absolute; top: 1.5rem; right: 1.5rem; background-color: transparent; border: 1px solid var(--danger-color); color: var(--danger-color); padding: 0.5rem 1rem; border-radius: 5px; font-weight: bold; cursor: pointer; font-size: 0.9rem; transition: background-color 0.2s, color 0.2s; }
+.delete-corner-btn:hover { background-color: var(--danger-color); color: white; }
+.tender-detail-container .tender-card-header { margin-top: 2.5rem; }
+
+.tender-doc-download { background-color: #e8f4f8; border: 1px solid #bce8f1; padding: 20px; border-radius: 5px; margin: 20px 0; }
+.tender-doc-download h3 { margin-top: 0; color: #31708f; }
+.doc-link { display: inline-block; background-color: #31708f; color: white; padding: 10px 15px; border-radius: 5px; text-decoration: none; font-weight: bold; margin-top: 10px; }
+.doc-link:hover { background-color: #245269; }
+
+.search-filter-container { display: flex; gap: 15px; margin-bottom: 30px; }
+.search-input { flex: 2; padding: 12px; border: 1px solid #ccc; border-radius: 5px; font-size: 1rem; }
+.filter-select { flex: 1; padding: 12px; border: 1px solid #ccc; border-radius: 5px; font-size: 1rem; background-color: white; cursor: pointer; }
+.no-results { text-align: center; color: var(--light-text); font-style: italic; margin-top: 2rem; }
+
+
+
+/* ... existing styles ... */
+
+.status-review-pending {
+    background-color: #e67e22; /* Orange */
+    color: white;
+}
+
+.review-pending-box {
+    background-color: #fff3cd;
+    border: 1px solid #ffeeba;
+    color: #856404;
+    padding: 20px;
+    margin: 20px 0;
+    border-radius: 8px;
+}
+
+.extension-controls {
+    margin-top: 15px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.extension-controls input {
+    padding: 8px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+}
