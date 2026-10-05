@@ -1,4 +1,3 @@
-const BACKEND_URL = process.env.REACT_APP_BACKEND_URL || 'http://localhost:5000';
 import React, { useState, useEffect } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
 import { useForm } from 'react-hook-form';
@@ -6,9 +5,11 @@ import api from '../../api';
 import { useAuth } from '../../hooks/useAuth';
 import { ethers } from 'ethers';
 
+const BACKEND_URL = process.env.REACT_APP_BACKEND_URL || 'http://localhost:5000';
+
 const TenderDetail = () => {
     // --- 🔴 CHECK THIS ADDRESS IN YOUR TERMINAL 🔴 ---
-    const CONTRACT_ADDRESS = "0x5FbDB2315678afecb367f032d93F642f64180aa3"; 
+    const CONTRACT_ADDRESS = process.env.REACT_APP_CONTRACT_ADDRESS;
     
     const { id } = useParams();
     const { user, token, isContractor, isAdmin } = useAuth();
@@ -33,7 +34,9 @@ const TenderDetail = () => {
     const verifyIntegrity = async () => {
         setIsVerifying(true);
         try {
-            const provider = new ethers.JsonRpcProvider("http://127.0.0.1:8545");
+            const provider = new ethers.JsonRpcProvider(
+              process.env.REACT_APP_BLOCKCHAIN_RPC_URL,
+            );
             const abi = [ 
                 "function awards(uint256) public view returns (string, string, uint256, uint256)",
                 "function getAwardCount() public view returns (uint256)"
