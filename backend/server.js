@@ -18,8 +18,22 @@ const startTenderScheduler = require('./utils/tenderScheduler');
 
 const app = express();
 
-app.use(cors({ origin: process.env.FRONTEND_URL || 'http://localhost:3000' }));
-app.use(express.json());
+const allowedOrigins = [
+    'http://localhost:3000',
+    'https://government-tender-management-system.vercel.app'
+];
+
+app.use(cors({
+    origin: function (origin, callback) {
+        if (!origin || allowedOrigins.includes(origin)) {
+            callback(null, true);
+        } else {
+            callback(new Error('Not allowed by CORS'));
+        }
+    },
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
+    allowedHeaders: ['Content-Type', 'Authorization']
+}));app.use(express.json());
 app.use('/uploads', express.static(path.join(__dirname, '/uploads')));
 
 app.use('/api/users', require('./routes/userRoutes'));
