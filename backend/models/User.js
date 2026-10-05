@@ -16,7 +16,7 @@ const userSchema = mongoose.Schema({
     yearsExperience: { type: Number, default: 0 },
     avgRating: { type: Number, default: 0 },
 
-    walletAddress: { type: String, default: '0x70997970C51812dc3A010C7d01b50e0d17dc79C8' } // Default Hardhat Account #1
+    walletAddress: { type: String, default: '0x0e60741Ac5b0EBb5e55f2eF0E4E191D9e77F4B7E' } // Default Hardhat Account #1
 
 }, { timestamps: true });
 
