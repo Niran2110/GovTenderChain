@@ -28,7 +28,10 @@ const TenderDetail = () => {
         } catch (error) { setTender(null); }
     };
 
-    useEffect(() => { fetchTender(); }, [id, isBidSubmitted, uploadingMilestone]);
+    useEffect(() => {
+      fetchTender();
+      // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [id, isBidSubmitted, uploadingMilestone]);
 
     // --- BLOCKCHAIN VERIFICATION ---
     const verifyIntegrity = async () => {

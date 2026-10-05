@@ -2,7 +2,6 @@ import api from '../../api';
 import React from 'react';
 import { useForm } from 'react-hook-form';
 import { useNavigate, Link } from 'react-router-dom';
-import axios from 'axios';
 import { useAuth } from '../../hooks/useAuth';
 
 const Login = () => {

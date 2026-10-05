@@ -5,7 +5,7 @@ import api from '../../api';
 import { useAuth } from '../../hooks/useAuth';
 
 const CreateTender = () => {
-    const { register, handleSubmit, control, formState: { errors } } = useForm({
+    const { register, handleSubmit, control} = useForm({
         defaultValues: { milestones: [{ name: '', payoutAmount: '' }] }
     });
     const { fields, append, remove } = useFieldArray({ control, name: 'milestones' });
