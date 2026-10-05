@@ -137,6 +137,7 @@ blockchain/cache/
 blockchain/typechain/
 blockchain/coverage/
 blockchain/ignition/deployments/
+blockchain/.env
 
 *.log
 npm-debug.log*
