@@ -300,7 +300,6 @@ exports.getTenderById = async (req, res) => {
 
 // --- NEW FUNCTION (10): Upload Milestone Proof ---
 // Used by Contractor to upload work photo -> Triggers AI Vision Analysis
-const { ethers } = require('ethers'); // Make sure this is at the top of the file
 
 exports.uploadMilestoneProof = async (req, res) => {
     try {
