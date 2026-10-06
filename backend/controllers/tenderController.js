@@ -1,6 +1,27 @@
 const Tender = require('../models/Tender');
 const User = require('../models/User');
 const axios = require('axios'); // Requires: npm install axios
+const { ethers } = require('ethers');
+
+const getBlockchainWallet = () => {
+    if (!process.env.BLOCKCHAIN_RPC_URL) {
+        throw new Error('BLOCKCHAIN_RPC_URL is not configured');
+    }
+
+    if (!process.env.BLOCKCHAIN_PRIVATE_KEY) {
+        throw new Error('BLOCKCHAIN_PRIVATE_KEY is not configured');
+    }
+
+    const provider = new ethers.JsonRpcProvider(
+        process.env.BLOCKCHAIN_RPC_URL
+    );
+
+    return new ethers.Wallet(
+        process.env.BLOCKCHAIN_PRIVATE_KEY,
+        provider
+    );
+};
+
 
 // 1. Create Tender
 // Updated: Handles text, file upload, and JSON parsing for arrays
@@ -97,10 +118,10 @@ exports.approveMilestone = async (req, res) => {
         try {
             console.log("Admin Initiated Manual Web3 Transfer...");
             const { ethers } = require('ethers');
-            const provider = new ethers.JsonRpcProvider(process.env.BLOCKCHAIN_RPC_URL);
-
-            // Admin Wallet (Account #0 in Hardhat)
-            const adminWallet = await provider.getSigner(0);
+            
+            const adminWallet = getBlockchainWallet();
+            
+            
 
             // Find the winning contractor to get their wallet address
             const winningBid = tender.bids.find(b => b.status === 'Awarded');
@@ -180,17 +201,48 @@ exports.awardTender = async (req, res) => {
         if (winningBid) {
             try {
                 console.log("Writing Award to Blockchain...");
-                const { ethers } = require('ethers');
-                const provider = new ethers.JsonRpcProvider(process.env.BLOCKCHAIN_RPC_URL);
-                const adminWallet = await provider.getSigner(0);
-                const contractABI = ["function recordWinner(string, string, uint256) public"];
-                const contractAddress = "0x5FbDB2315678afecb367f032d93F642f64180aa3";
-                const contract = new ethers.Contract(contractAddress, contractABI, adminWallet);
-                const tx = await contract.recordWinner(tender._id.toString(), winningBid.contractorName, winningBid.bidAmount);
+
+                const adminWallet = getBlockchainWallet();
+
+                const contractABI = [
+                    "function recordWinner(string, string, uint256) public"
+                ];
+
+                const contractAddress = process.env.CONTRACT_ADDRESS;
+
+                if (!contractAddress) {
+                    throw new Error(
+                        "CONTRACT_ADDRESS is not configured"
+                    );
+                }
+
+                const contract = new ethers.Contract(
+                    contractAddress,
+                    contractABI,
+                    adminWallet
+                );
+
+                const tx = await contract.recordWinner(
+                    tender._id.toString(),
+                    winningBid.contractorName,
+                    winningBid.bidAmount
+                );
+
                 await tx.wait();
-                console.log(`✅ Blockchain Record Successful! Hash: ${tx.hash}`);
+
+                console.log(
+                    `✅ Blockchain Record Successful! Hash: ${tx.hash}`
+                );
+
             } catch (web3Error) {
-                console.error("Web3 Award Failed:", web3Error.message);
+                console.error(
+                    "Web3 Award Failed:",
+                    web3Error.message
+                );
+
+                return res.status(500).json({
+                    msg: `Blockchain award failed: ${web3Error.message}`
+                });
             }
         }
 

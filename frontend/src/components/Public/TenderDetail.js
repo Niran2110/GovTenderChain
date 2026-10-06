@@ -67,7 +67,12 @@ const TenderDetail = () => {
                 alert(`❌ TAMPERING DETECTED!`);
             }
         } catch (error) {
-            alert("Connection Error: Make sure Hardhat is running!");
+            alert(
+    `Blockchain connection error: ${
+        error?.message ||
+        'Unable to read Sepolia blockchain'
+    }`
+);
         }
         setIsVerifying(false);
     };
@@ -122,7 +127,14 @@ const TenderDetail = () => {
     const handleApproveMilestone = async (milestoneId) => {
          if (window.confirm('Manually approve payment?')) {
             const config = { headers: { Authorization: `Bearer ${token}` } };
-            try { await api.put(`/tenders/${id}/milestones/${milestoneId}/approve`, {}, config); fetchTender(); } catch (e) {}
+            try { await api.put(`/tenders/${id}/milestones/${milestoneId}/approve`, {}, config); fetchTender(); } catch (error) {
+    console.error('Manual approval failed:', error);
+
+    alert(
+        error.response?.data?.msg ||
+        'Manual approval failed.'
+    );
+}
          }
     };
 
