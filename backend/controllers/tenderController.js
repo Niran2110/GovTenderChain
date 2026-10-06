@@ -372,10 +372,7 @@ exports.uploadMilestoneProof = async (req, res) => {
                 // --- 💸 WEB3 SMART PAYMENT EXECUTION ---
                 try {
                     console.log("Initiating Web3 Transfer...");
-                    const provider = new ethers.JsonRpcProvider(process.env.BLOCKCHAIN_RPC_URL);
-
-                    // Admin Wallet (Account #0 in Hardhat)
-                    const adminWallet = await provider.getSigner(0);
+                    const adminWallet = getBlockchainWallet();
 
                     // Convert Milestone Payout to fake ETH (e.g., ₹100,000 = 1 ETH)
                     const ethAmount = (milestone.payoutAmount / 100000).toString();
