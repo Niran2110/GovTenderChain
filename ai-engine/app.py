@@ -1,3 +1,6 @@
+import requests
+import tempfile
+
 import io
 import requests
 
@@ -174,64 +177,51 @@ def compare_docs():
 # 4. VISION: IMAGE ANALYSIS
 # =========================================================
 
-@app.route("/analyze-work", methods=["POST"])
+@app.route('/analyze-work', methods=['POST'])
 def analyze_work():
-
     try:
+        data = request.json
 
-        data = request.get_json()
-
-        image_url = data.get("image_url")
-
-
-        print("\n--- NEW VISION ANALYSIS ---")
-
-        print(f"Image URL: {image_url}")
-
+        image_url = data.get('image_url')
 
         if not image_url:
-
             return jsonify({
-                "status": "Failed",
-                "detected_object": "Image URL Missing",
+                "status": "Error",
+                "detected_object": "No Image URL",
                 "quality_score": 0
             }), 400
 
+        print("\n--- 📸 NEW VISION ANALYSIS ---")
+        print(f"Downloading image from: {image_url}")
 
-        if vision_model is None:
+        # Download Cloudinary image
+        response = requests.get(
+            image_url,
+            timeout=30
+        )
 
-            return jsonify({
-                "status": "Failed",
-                "detected_object": "AI Model Not Loaded",
-                "quality_score": 0
-            }), 500
+        response.raise_for_status()
 
+        # Save temporarily
+        with tempfile.NamedTemporaryFile(
+            suffix=".jpg",
+            delete=False
+        ) as temp_file:
 
-        # Download image from Cloudinary
-        image_bytes = download_file(image_url)
+            temp_file.write(response.content)
+            temp_image_path = temp_file.name
 
+        print(f"Temporary image: {temp_image_path}")
 
-        # Convert downloaded bytes into an image
-        image_file = io.BytesIO(image_bytes)
-
+        # Load image
         img = image.load_img(
-            image_file,
+            temp_image_path,
             target_size=(224, 224)
         )
 
-
-        # Convert image to numpy array
         img_array = image.img_to_array(img)
-
-        img_array = np.expand_dims(
-            img_array,
-            axis=0
-        )
-
-
-        # MobileNetV2 preprocessing
+        img_array = np.expand_dims(img_array, axis=0)
         img_array = preprocess_input(img_array)
-
 
         # AI prediction
         predictions = vision_model.predict(
@@ -239,14 +229,11 @@ def analyze_work():
             verbose=0
         )
 
-
         results = decode_predictions(
             predictions,
             top=1
         )[0]
 
-
-        # Best prediction
         best_guess = results[0][1]
 
         confidence = round(
@@ -254,57 +241,37 @@ def analyze_work():
             2
         )
 
-
         print(
-            f"AI Saw: {best_guess} "
+            f"🤖 AI Saw: {best_guess} "
             f"with {confidence}% confidence"
         )
 
+        # Delete temporary file
+        try:
+            os.remove(temp_image_path)
+        except Exception:
+            pass
 
         return jsonify({
-
             "status": "Success",
-
-            "detected_object":
-                best_guess.replace("_", " ").title(),
-
-            "quality_score":
-                confidence
-
+            "detected_object": best_guess.replace(
+                '_',
+                ' '
+            ).title(),
+            "quality_score": confidence
         })
-
-
-    except requests.exceptions.RequestException as e:
-
-        print(f"Image download error: {e}")
-
-        return jsonify({
-
-            "status": "Failed",
-
-            "detected_object":
-                "Could Not Download Image",
-
-            "quality_score":
-                0
-
-        }), 500
-
 
     except Exception as e:
 
-        print(f"Vision AI Error: {e}")
+        print(
+            f"❌ Vision AI Error: {type(e).__name__}: {e}"
+        )
 
         return jsonify({
-
             "status": "Error",
-
-            "detected_object":
-                "Unreadable",
-
-            "quality_score":
-                0
-
+            "detected_object": "Unreadable",
+            "quality_score": 0,
+            "error": str(e)
         }), 500
 
 
