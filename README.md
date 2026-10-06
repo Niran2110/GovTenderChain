@@ -715,7 +715,7 @@ Vercel
 Production frontend:
 
 ```text
-https://govtenderchain-mcn33ry18-nj-b7e9.vercel.app/
+https://government-tender-management-system.vercel.app/
 ```
 
 ## Backend
