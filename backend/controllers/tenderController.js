@@ -117,36 +117,78 @@ exports.approveMilestone = async (req, res) => {
         // --- 💸 WEB3 SMART PAYMENT EXECUTION (MANUAL ADMIN OVERRIDE) ---
         try {
             console.log("Admin Initiated Manual Web3 Transfer...");
-            const { ethers } = require('ethers');
-            
+
             const adminWallet = getBlockchainWallet();
-            
-            
 
-            // Find the winning contractor to get their wallet address
-            const winningBid = tender.bids.find(b => b.status === 'Awarded');
-            const contractor = await require('../models/User').findById(winningBid.contractorId);
+            // Find the winning contractor
+            const winningBid = tender.bids.find(
+                b => b.status === 'Awarded'
+            );
 
-            // Convert Milestone Payout to fake ETH (e.g., ₹100,000 = 1 ETH)
-            const ethAmount = (milestone.payoutAmount / 100000).toString();
+            if (!winningBid) {
+                throw new Error('No awarded bid found for this tender');
+            }
 
-            // Send the transaction
+            const contractor = await User.findById(
+                winningBid.contractorId
+            );
+
+            if (!contractor) {
+                throw new Error('Contractor user not found');
+            }
+
+            if (!contractor.walletAddress) {
+                throw new Error('Contractor wallet address is missing');
+            }
+
+            console.log(
+                `Contractor wallet: ${contractor.walletAddress}`
+            );
+
+            // Convert milestone payout to test ETH
+            // Example: ₹100,000 = 1 ETH
+            const ethAmount =
+                (Number(milestone.payoutAmount) / 100000).toString();
+
+            console.log(
+                `Sending ${ethAmount} Sepolia ETH...`
+            );
+
             const tx = await adminWallet.sendTransaction({
                 to: contractor.walletAddress,
                 value: ethers.parseEther(ethAmount)
             });
 
-            await tx.wait(); // Wait for blockchain confirmation
-            console.log(`✅ Manual Payment Sent! Hash: ${tx.hash}`);
+            console.log(
+                `Transaction submitted: ${tx.hash}`
+            );
 
-            // Append the receipt to the milestone analysis text
-            const previousText = milestone.aiAnalysis ? milestone.aiAnalysis : "Manual Admin Approval";
-            milestone.aiAnalysis = `${previousText} | 🔗 Manual Tx Hash: ${tx.hash}`;
+            await tx.wait();
+
+            console.log(
+                `✅ Manual Payment Sent! Hash: ${tx.hash}`
+            );
+
+            // Save transaction hash
+            const previousText = milestone.aiAnalysis
+                ? milestone.aiAnalysis
+                : "Manual Admin Approval";
+
+            milestone.aiAnalysis =
+                `${previousText} | 🔗 Manual Tx Hash: ${tx.hash}`;
 
         } catch (web3Error) {
-            console.error("Web3 Payment Failed:", web3Error.message);
-            return res.status(500).json({ msg: 'Blockchain payment failed to execute. Is Hardhat running?' });
-        }
+
+            console.error(
+                "❌ Web3 Payment Failed:",
+                web3Error
+            );
+
+    return res.status(500).json({
+        msg: `Blockchain payment failed: ${web3Error.message}`
+    });
+}
+// ---------------------------------------------------------------
         // ---------------------------------------------------------------
 
         // Update database status to Approved
