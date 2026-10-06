@@ -400,9 +400,11 @@ exports.uploadMilestoneProof = async (req, res) => {
                 milestone.status = 'Review';
             }
         } catch (error) {
-            aiAnalysis = "AI Failed - Manual Review Required";
-            milestone.status = 'Review';
-        }
+    console.error("❌ AI WORK ANALYSIS FAILED:", error.response?.data || error.message);
+
+    aiAnalysis = `AI Failed: ${error.response?.data?.error || error.message}`;
+    milestone.status = "Review";
+}
 
         milestone.proofImage = req.file.path.replace(/\\/g, "/");
         milestone.aiAnalysis = aiAnalysis;
