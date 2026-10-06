@@ -33,6 +33,7 @@ const Register = () => {
         turnover: parseFloat(data.turnover),
         yearsExperience: parseInt(data.yearsExperience, 10),
         avgRating: parseFloat(data.avgRating),
+        walletAddress: data.walletAddress
     };
 
     try {
@@ -95,6 +96,23 @@ const Register = () => {
 
         <fieldset>
           <legend>Login Credentials</legend>
+          <div className="form-group">
+            <label>Sepolia MetaMask Wallet Address</label>
+            <input
+                type="text"
+                {...register("walletAddress", {
+                    required: "Wallet address is required",
+                    pattern: {
+                        value: /^0x[a-fA-F0-9]{40}$/,
+                        message: "Enter a valid Ethereum wallet address"
+                    }
+                })}
+                placeholder="0x..."
+            />
+            {errors.walletAddress && (
+                <p className="error">{errors.walletAddress.message}</p>
+            )}
+            </div>
           <div className="form-group">
             <label>Email Address</label>
             <input type="email" {...register("email", { required: "Email is required" })} />
