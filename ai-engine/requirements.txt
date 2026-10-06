@@ -1,7 +1,6 @@
 Flask
 PyPDF2
 scikit-learn
-tensorflow
 numpy
 gunicorn
 requests
