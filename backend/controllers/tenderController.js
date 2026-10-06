@@ -344,77 +344,180 @@ exports.getTenderById = async (req, res) => {
 // Used by Contractor to upload work photo -> Triggers AI Vision Analysis
 
 exports.uploadMilestoneProof = async (req, res) => {
+
     try {
-        if (!req.file) return res.status(400).json({ msg: 'No file uploaded' });
+
+        // -------------------------------------------------
+        // 1. Check uploaded image
+        // -------------------------------------------------
+
+        if (!req.file) {
+            return res.status(400).json({
+                msg: 'No file uploaded'
+            });
+        }
+
+        // -------------------------------------------------
+        // 2. Find tender
+        // -------------------------------------------------
 
         const tender = await Tender.findById(req.params.id);
-        const milestone = tender.milestones.id(req.params.milestoneId);
 
-        // Find the winning contractor to get their wallet address
-        const winningBid = tender.bids.find(b => b.status === 'Awarded');
-        const contractor = await User.findById(winningBid.contractorId);
+        if (!tender) {
+            return res.status(404).json({
+                msg: 'Tender not found'
+            });
+        }
+
+        // -------------------------------------------------
+        // 3. Find milestone
+        // -------------------------------------------------
+
+        const milestone = tender.milestones.id(
+            req.params.milestoneId
+        );
+
+        if (!milestone) {
+            return res.status(404).json({
+                msg: 'Milestone not found'
+            });
+        }
+
+        // -------------------------------------------------
+        // 4. Find awarded contractor
+        // -------------------------------------------------
+
+        const winningBid = tender.bids.find(
+            b => b.status === 'Awarded'
+        );
+
+        if (!winningBid) {
+            return res.status(400).json({
+                msg: 'No awarded contractor found'
+            });
+        }
+
+        const contractor = await User.findById(
+            winningBid.contractorId
+        );
+
+        if (!contractor) {
+            return res.status(404).json({
+                msg: 'Contractor not found'
+            });
+        }
+
+        // -------------------------------------------------
+        // 5. Initial AI status
+        // -------------------------------------------------
 
         let aiAnalysis = "Pending Analysis";
 
+        // -------------------------------------------------
+        // 6. AI IMAGE SCREENING
+        // -------------------------------------------------
+
         try {
-            // 1. Call AI Engine
-            const aiResponse = await axios.post(`${process.env.AI_ENGINE_URL}/analyze-work`, {
-                image_url: req.file.path
-            });
-            const { quality_score, detected_object, status } = aiResponse.data;
-            aiAnalysis = `${status} - Detected: ${detected_object} (${quality_score}%)`;
 
-            // 2. Auto-Approve & PAY LOGIC
-            if (quality_score > 80) {
-                milestone.status = 'Approved';
-                aiAnalysis += " [Auto-Approved by AI]";
+            console.log(
+                "🤖 Sending work proof image to AI Engine..."
+            );
 
-                // --- 💸 WEB3 SMART PAYMENT EXECUTION ---
-                try {
-                    console.log("Initiating Web3 Transfer...");
-                    const adminWallet = getBlockchainWallet();
-
-                    // Convert Milestone Payout to fake ETH (e.g., ₹100,000 = 1 ETH)
-                    const ethAmount = (milestone.payoutAmount / 100000).toString();
-
-                    // Send the transaction
-                    const tx = await adminWallet.sendTransaction({
-                        to: contractor.walletAddress,
-                        value: ethers.parseEther(ethAmount)
-                    });
-
-                    await tx.wait(); // Wait for blockchain confirmation
-
-                    console.log(`✅ Payment Sent! Hash: ${tx.hash}`);
-
-                    // Save receipt to database
-                    aiAnalysis += ` | 🔗 Tx Hash: ${tx.hash}`;
-
-                } catch (web3Error) {
-                    console.error("Web3 Payment Failed:", web3Error.message);
-                    aiAnalysis += " [⚠️ AI Approved, but Web3 Payment Failed]";
+            const aiResponse = await axios.post(
+                `${process.env.AI_ENGINE_URL}/analyze-work`,
+                {
+                    image_url: req.file.path
+                },
+                {
+                    timeout: 45000
                 }
-                // ----------------------------------------
+            );
 
-            } else {
-                milestone.status = 'Review';
-            }
+            const {
+                quality_score,
+                detected_object,
+                status,
+                recommendation
+            } = aiResponse.data;
+
+            console.log(
+                "🤖 AI Image Analysis:",
+                aiResponse.data
+            );
+
+            // -------------------------------------------------
+            // 7. Save AI result
+            // -------------------------------------------------
+
+            aiAnalysis =
+                `${status} - ` +
+                `Image: ${detected_object} - ` +
+                `Image Quality: ${quality_score}% - ` +
+                `Recommendation: ${recommendation}`;
+
+            // -------------------------------------------------
+            // 8. IMPORTANT:
+            // AI DOES NOT approve or pay
+            // -------------------------------------------------
+
+            milestone.status = 'Review';
+
+            aiAnalysis +=
+                " | 👨‍💼 Admin verification required";
+
         } catch (error) {
-    console.error("❌ AI WORK ANALYSIS FAILED:", error.response?.data || error.message);
 
-    aiAnalysis = `AI Failed: ${error.response?.data?.error || error.message}`;
-    milestone.status = "Review";
-}
+            console.error(
+                "❌ AI WORK ANALYSIS FAILED:",
+                error.response?.data ||
+                error.message
+            );
 
-        milestone.proofImage = req.file.path.replace(/\\/g, "/");
-        milestone.aiAnalysis = aiAnalysis;
+            // AI failure should NOT break image upload
+            milestone.status = 'Review';
+
+            aiAnalysis =
+                `AI Analysis Failed - ` +
+                `${error.response?.data?.error ||
+                error.message} ` +
+                `| 👨‍💼 Manual Review Required`;
+        }
+
+        // -------------------------------------------------
+        // 9. Save uploaded proof image
+        // -------------------------------------------------
+
+        milestone.proofImage =
+            req.file.path.replace(/\\/g, "/");
+
+        milestone.aiAnalysis =
+            aiAnalysis;
+
+        // -------------------------------------------------
+        // 10. Save milestone
+        // -------------------------------------------------
+
         tender.markModified('milestones');
+
         await tender.save();
+
+        // -------------------------------------------------
+        // 11. Return updated tender
+        // -------------------------------------------------
+
         res.json(tender);
 
     } catch (err) {
-        console.error("Upload Error:", err);
-        res.status(500).send('Server Error');
+
+        console.error(
+            "Upload Milestone Proof Error:",
+            err
+        );
+
+        res.status(500).json({
+            msg: 'Server Error',
+            error: err.message
+        });
     }
 };
 
